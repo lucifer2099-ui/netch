@@ -3,6 +3,7 @@ using System.Text.Json;
 using Netch.JsonConverter;
 using Netch.Models;
 using Netch.Servers;
+using Netch.Services;
 
 namespace Netch.Utils;
 
@@ -75,12 +76,19 @@ public static class ShareLink
         }
         else
         {
-            var scheme = GetUriScheme(text);
-            var util = ServerHelper.GetUtilByUriScheme(scheme);
-            if (util != null)
-                list.AddRange(util.ParseUri(text));
+            if (ModernShareLinkParser.TryParse(text, out var modernServers))
+            {
+                list.AddRange(modernServers);
+            }
             else
-                Log.Warning("\"{Scheme}\" scheme share link not supported", scheme);
+            {
+                var scheme = GetUriScheme(text);
+                var util = ServerHelper.GetUtilByUriScheme(scheme);
+                if (util != null)
+                    list.AddRange(util.ParseUri(text));
+                else
+                    Log.Warning("\"{Scheme}\" scheme share link not supported", scheme);
+            }
         }
 
         foreach (var node in list.Where(node => !node.Remark.IsNullOrWhiteSpace()))

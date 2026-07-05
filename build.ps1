@@ -39,6 +39,28 @@ cp -Recurse -Force '..\Storage\aiodns.conf' 'bin'  | Out-Null
 Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/Loyalsoldier/geoip/release/Country.mmdb' -OutFile 'bin\GeoLite2-Country.mmdb'
 #cp -Recurse -Force '..\Storage\GeoLite2-Country.mmdb' 'bin'  | Out-Null
 cp -Recurse -Force '..\Storage\tun2socks.bin' 'bin'  | Out-Null
+if ( Test-Path '..\Storage\sing-box.exe' ) {
+	cp -Recurse -Force '..\Storage\sing-box.exe' 'bin'  | Out-Null
+	if ( Test-Path '..\Storage\sing-box.manifest.json' ) {
+		cp -Recurse -Force '..\Storage\sing-box.manifest.json' 'bin'  | Out-Null
+	}
+} else {
+	Write-Warning 'Storage\sing-box.exe not found; modern sing-box nodes will not start in this build. Run tools\install-sing-box.ps1 to install it.'
+}
+if ( Test-Path '..\Storage\v2ray-sn.exe' ) {
+	cp -Recurse -Force '..\Storage\v2ray-sn.exe' 'bin'  | Out-Null
+	if ( Test-Path '..\Storage\v2ray-sn.manifest.json' ) {
+		cp -Recurse -Force '..\Storage\v2ray-sn.manifest.json' 'bin'  | Out-Null
+	}
+	if ( Test-Path '..\Storage\geoip.dat' ) {
+		cp -Recurse -Force '..\Storage\geoip.dat' 'bin'  | Out-Null
+	}
+	if ( Test-Path '..\Storage\geosite.dat' ) {
+		cp -Recurse -Force '..\Storage\geosite.dat' 'bin'  | Out-Null
+	}
+} else {
+	Write-Warning 'Storage\v2ray-sn.exe not found; legacy V2Ray-backed nodes will not start in this build. Run tools\install-v2ray-sn.ps1 to install it.'
+}
 cp -Recurse -Force '..\Storage\README.md' 'bin'  | Out-Null
 Pop-Location
 

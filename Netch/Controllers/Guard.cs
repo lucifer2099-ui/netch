@@ -11,16 +11,13 @@ public abstract class Guard
 {
     private FileStream? _logFileStream;
     private StreamWriter? _logStreamWriter;
+    private string? _lastOutputLine;
 
-    /// <param name="mainFile">application path relative of Netch\bin</param>
-    /// <param name="redirectOutput"></param>
-    /// <param name="encoding">application output encode</param>
     protected Guard(string mainFile, bool redirectOutput = true, Encoding? encoding = null)
     {
         RedirectOutput = redirectOutput;
 
         var fileName = Path.GetFullPath($"bin\\{mainFile}");
-
         if (!File.Exists(fileName))
             throw new MessageException(i18N.Translate($"bin\\{mainFile} file not found!"));
 
@@ -69,37 +66,36 @@ public abstract class Guard
         if (priority != ProcessPriorityClass.Normal)
             Instance.PriorityClass = priority;
 
-        if (RedirectOutput)
+        if (!RedirectOutput)
+            return;
+
+        ReadOutputAsync(Instance.StandardOutput).Forget();
+        ReadOutputAsync(Instance.StandardError).Forget();
+
+        if (!StartedKeywords.Any())
         {
-            ReadOutputAsync(Instance.StandardOutput).Forget();
-            ReadOutputAsync(Instance.StandardError).Forget();
-
-            if (!StartedKeywords.Any())
-            {
-                // Skip, No started keyword
-                State = State.Started;
-                return;
-            }
-
-            // wait ReadOutput change State
-            for (var i = 0; i < 1000; i++)
-            {
-                await Task.Delay(50);
-                switch (State)
-                {
-                    case State.Started:
-                        OnStarted();
-                        return;
-                    case State.Stopped:
-                        await StopGuardAsync();
-                        OnStartFailed();
-                        throw new MessageException($"{Name} 控制器启动失败");
-                }
-            }
-
-            await StopGuardAsync();
-            throw new MessageException($"{Name} 控制器启动超时");
+            State = State.Started;
+            return;
         }
+
+        for (var i = 0; i < 1000; i++)
+        {
+            await Task.Delay(50);
+            switch (State)
+            {
+                case State.Started:
+                    OnStarted();
+                    return;
+                case State.Stopped:
+                    var failedLine = _lastOutputLine;
+                    await StopGuardAsync();
+                    OnStartFailed();
+                    throw new MessageException(BuildStartFailureMessage(failedLine));
+            }
+        }
+
+        await StopGuardAsync();
+        throw new MessageException($"{Name} controller start timed out.");
     }
 
     private async Task ReadOutputAsync(TextReader reader)
@@ -107,18 +103,19 @@ public abstract class Guard
         string? line;
         while ((line = await reader.ReadLineAsync()) != null)
         {
+            _lastOutputLine = line;
             await _logStreamWriter!.WriteLineAsync(line);
             OnReadNewLine(line);
 
-            if (State == State.Starting)
+            if (State != State.Starting)
+                continue;
+
+            if (StartedKeywords.Any(s => line.Contains(s, StringComparison.OrdinalIgnoreCase)))
+                State = State.Started;
+            else if (FailedKeywords.Any(s => line.Contains(s, StringComparison.OrdinalIgnoreCase)))
             {
-                if (StartedKeywords.Any(s => line.Contains(s)))
-                    State = State.Started;
-                else if (FailedKeywords.Any(s => line.Contains(s)))
-                {
-                    OnStartFailed();
-                    State = State.Stopped;
-                }
+                Log.Error("{Name} start failed: {Line}", Name, line);
+                State = State.Stopped;
             }
         }
     }
@@ -151,7 +148,6 @@ public abstract class Guard
                 await _logFileStream.DisposeAsync();
 
             Instance.Dispose();
-
             State = State.Stopped;
         }
     }
@@ -167,5 +163,12 @@ public abstract class Guard
     protected virtual void OnStartFailed()
     {
         Utils.Utils.Open(LogPath);
+    }
+
+    private string BuildStartFailureMessage(string? failedLine)
+    {
+        return string.IsNullOrWhiteSpace(failedLine)
+            ? $"{Name} controller start failed. See {LogPath}."
+            : $"{Name} controller start failed.\n{failedLine}";
     }
 }

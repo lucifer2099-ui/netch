@@ -33,6 +33,7 @@ public partial class MainForm : Form
         NotifyIcon.Icon = Icon = Resources.icon;
 
         AddAddServerToolStripMenuItems();
+        AddDiagnosticsToolStripMenuItems();
 
         #region i18N Translations
 
@@ -45,6 +46,21 @@ public partial class MainForm : Form
 
         // 监听电源事件
         SystemEvents.PowerModeChanged += SystemEvents_PowerModeChanged;
+    }
+
+    private void AddDiagnosticsToolStripMenuItems()
+    {
+        var control = new ToolStripMenuItem
+        {
+            Name = "HttpConnectivityTestToolStripMenuItem",
+            Size = new Size(259, 22),
+            Text = i18N.Translate("HTTP Connectivity Test")
+        };
+
+        _mainFormText.Add(control.Name, "HTTP Connectivity Test");
+        control.Click += HttpConnectivityTestToolStripMenuItem_Click;
+        ServerToolStripMenuItem.DropDownItems.Add(new ToolStripSeparator());
+        ServerToolStripMenuItem.DropDownItems.Add(control);
     }
 
     private void AddAddServerToolStripMenuItems()
@@ -299,11 +315,12 @@ public partial class MainForm : Form
 
         try
         {
-            await SubscriptionUtil.UpdateServersAsync();
+            var summary = await SubscriptionUtil.UpdateServersAsync();
 
             LoadServers();
             await Configuration.SaveAsync();
             StatusText(i18N.Translate("Servers updated"));
+            MessageBoxX.Show(summary.ToDisplayText(), summary.FailedCount > 0 ? LogLevel.WARNING : LogLevel.INFO);
         }
         catch (Exception e)
         {
@@ -549,7 +566,7 @@ public partial class MainForm : Form
         {
             State = State.Stopped;
             StatusText(i18N.Translate("Start failed"));
-            MessageBoxX.Show(exception.Message, LogLevel.ERROR);
+            MessageBoxX.Show(StartupDiagnosticService.Explain(exception), LogLevel.ERROR);
             return;
         }
 
@@ -658,6 +675,12 @@ public partial class MainForm : Form
 
     private async void SpeedPictureBox_Click(object sender, EventArgs e)
     {
+        if (!IsWaiting())
+        {
+            await RunHttpConnectivityTestAsync(showStartHint: false);
+            return;
+        }
+
         void Enable()
         {
             ServerComboBox.Refresh();
@@ -668,7 +691,7 @@ public partial class MainForm : Form
         Enabled = false;
         StatusText(i18N.Translate("Testing"));
 
-        if (!IsWaiting() || ModifierKeys == Keys.Control)
+        if (ModifierKeys == Keys.Control)
         {
             (ServerComboBox.SelectedItem as Server)?.PingAsync();
             Enable();
@@ -678,6 +701,25 @@ public partial class MainForm : Form
             await DelayTestHelper.PerformTestAsync(true);
             Enable();
         }
+    }
+
+    private async void HttpConnectivityTestToolStripMenuItem_Click(object? sender, EventArgs e)
+    {
+        await RunHttpConnectivityTestAsync(showStartHint: true);
+    }
+
+    private async Task RunHttpConnectivityTestAsync(bool showStartHint)
+    {
+        if (MainController.Socks5Server == null || IsWaiting())
+        {
+            if (showStartHint)
+                MessageBoxX.Show("Please start a server before running HTTP connectivity test.", LogLevel.WARNING);
+
+            return;
+        }
+
+        await HttpConnectAsync();
+        NotifyTip("HTTP connectivity test finished");
     }
 
     private void CopyLinkPictureBox_Click(object sender, EventArgs e)
@@ -1196,15 +1238,22 @@ public partial class MainForm : Form
 
     private async Task HttpConnectAsync()
     {
-        HttpStatusLabel.Enabled = false;
+        if (MainController.Socks5Server == null || IsWaiting())
+            return;
 
-        _httpConnectCts = new CancellationTokenSource();
+        HttpStatusLabel.Enabled = false;
+        HttpStatusLabel.Text = $"HTTP{i18N.Translate(": ")}...";
+        HttpStatusLabel.Visible = true;
+
+        _httpConnectCts = new CancellationTokenSource(TimeSpan.FromSeconds(20));
 
         try
         {
-            var res = await MainController.HttpConnectAsync(_httpConnectCts.Token);
+            var testTask = MainController.HttpConnectAsync(_httpConnectCts.Token);
+            var completedTask = await Task.WhenAny(testTask, Task.Delay(TimeSpan.FromSeconds(21)));
+            var res = completedTask == testTask ? await testTask : null;
             if (_httpConnectCts.IsCancellationRequested)
-                return;
+                res = null;
 
             if (res != null)
                 HttpStatusLabel.Text = $"HTTP{i18N.Translate(": ")}{res}ms";

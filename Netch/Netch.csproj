@@ -69,6 +69,7 @@
     <PackageReference Include="System.ServiceProcess.ServiceController" Version="7.0.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0" />
     <PackageReference Include="WindowsJobAPI" Version="6.0.0" />
+    <PackageReference Include="YamlDotNet" Version="18.1.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -88,6 +89,8 @@
 
   <ItemGroup>
     <None Remove="NativeMethods.txt" />
+    <None Include="..\Storage\sing-box.manifest.json" Link="bin\sing-box.manifest.json" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\Storage\sing-box.manifest.json')" />
+    <None Include="..\Storage\v2ray-sn.manifest.json" Link="bin\v2ray-sn.manifest.json" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\Storage\v2ray-sn.manifest.json')" />
     <None Update="NOTICE.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -97,6 +100,57 @@
     <ItemGroup>
       <_FilesToBundle Remove="$(PkgMicrosoft_Diagnostics_Tracing_TraceEvent)\build\native\x86\**" />
     </ItemGroup>
+  </Target>
+
+  <Target Name="CopySingBoxRuntime" AfterTargets="Build;Publish" Condition="Exists('..\Storage\sing-box.exe')">
+    <PropertyGroup>
+      <SingBoxDestinationDir Condition="'$(PublishDir)' != ''">$(PublishDir)bin\</SingBoxDestinationDir>
+      <SingBoxDestinationDir Condition="'$(PublishDir)' == ''">$(OutputPath)bin\</SingBoxDestinationDir>
+    </PropertyGroup>
+    <MakeDir Directories="$(SingBoxDestinationDir)" />
+    <Copy SourceFiles="..\Storage\sing-box.exe" DestinationFolder="$(SingBoxDestinationDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="..\Storage\sing-box.manifest.json" DestinationFolder="$(SingBoxDestinationDir)" SkipUnchangedFiles="true" Condition="Exists('..\Storage\sing-box.manifest.json')" />
+  </Target>
+
+  <Target Name="CopyV2RayRuntime" AfterTargets="Build;Publish" Condition="Exists('..\Storage\v2ray-sn.exe')">
+    <PropertyGroup>
+      <V2RayDestinationDir Condition="'$(PublishDir)' != ''">$(PublishDir)bin\</V2RayDestinationDir>
+      <V2RayDestinationDir Condition="'$(PublishDir)' == ''">$(OutputPath)bin\</V2RayDestinationDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <V2RayRuntimeFiles Include="..\Storage\v2ray-sn.exe" />
+      <V2RayRuntimeFiles Include="..\Storage\v2ray-sn.manifest.json" Condition="Exists('..\Storage\v2ray-sn.manifest.json')" />
+      <V2RayRuntimeFiles Include="..\Storage\geoip.dat" Condition="Exists('..\Storage\geoip.dat')" />
+      <V2RayRuntimeFiles Include="..\Storage\geosite.dat" Condition="Exists('..\Storage\geosite.dat')" />
+    </ItemGroup>
+    <MakeDir Directories="$(V2RayDestinationDir)" />
+    <Copy SourceFiles="@(V2RayRuntimeFiles)" DestinationFolder="$(V2RayDestinationDir)" SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="CopyDefaultStorageAssets" AfterTargets="Build;Publish">
+    <PropertyGroup>
+      <StorageAssetsDestinationDir Condition="'$(PublishDir)' != ''">$(PublishDir)</StorageAssetsDestinationDir>
+      <StorageAssetsDestinationDir Condition="'$(PublishDir)' == ''">$(OutputPath)</StorageAssetsDestinationDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <DefaultModeFiles Include="..\Storage\mode\**\*" />
+      <DefaultI18NFiles Include="..\Storage\i18n\**\*" />
+      <DefaultStorageRootFiles Include="..\Storage\README.md" Condition="Exists('..\Storage\README.md')" />
+      <NativeRuntimeFiles Include="..\Storage\aiodns.bin" Condition="Exists('..\Storage\aiodns.bin')" />
+      <NativeRuntimeFiles Include="..\Storage\aiodns.conf" Condition="Exists('..\Storage\aiodns.conf')" />
+      <NativeRuntimeFiles Include="..\Storage\GeoLite2-Country.mmdb" Condition="Exists('..\Storage\GeoLite2-Country.mmdb')" />
+      <NativeRuntimeFiles Include="..\Storage\nfapi.dll" Condition="Exists('..\Storage\nfapi.dll')" />
+      <NativeRuntimeFiles Include="..\Storage\nfdriver.sys" Condition="Exists('..\Storage\nfdriver.sys')" />
+      <NativeRuntimeFiles Include="..\Storage\Redirector.bin" Condition="Exists('..\Storage\Redirector.bin')" />
+      <NativeRuntimeFiles Include="..\Storage\RouteHelper.bin" Condition="Exists('..\Storage\RouteHelper.bin')" />
+      <NativeRuntimeFiles Include="..\Storage\stun.txt" Condition="Exists('..\Storage\stun.txt')" />
+      <NativeRuntimeFiles Include="..\Storage\tun2socks.bin" Condition="Exists('..\Storage\tun2socks.bin')" />
+      <NativeRuntimeFiles Include="..\Storage\wintun.dll" Condition="Exists('..\Storage\wintun.dll')" />
+    </ItemGroup>
+    <Copy SourceFiles="@(DefaultModeFiles)" DestinationFiles="@(DefaultModeFiles->'$(StorageAssetsDestinationDir)mode\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(DefaultI18NFiles)" DestinationFiles="@(DefaultI18NFiles->'$(StorageAssetsDestinationDir)i18n\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(DefaultStorageRootFiles)" DestinationFolder="$(StorageAssetsDestinationDir)bin\" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(NativeRuntimeFiles)" DestinationFolder="$(StorageAssetsDestinationDir)bin\" SkipUnchangedFiles="true" />
   </Target>
 
 </Project>

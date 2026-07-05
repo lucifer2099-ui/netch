@@ -12,6 +12,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
+
       - name: Checksum
         shell: pwsh
         run: |
@@ -68,6 +73,26 @@ jobs:
           toolchain: nightly
           profile: minimal
 
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.3.1
+        with:
+          vs-prerelease: true
+
+      - name: Install sing-box
+        shell: pwsh
+        run: |
+          .\tools\install-sing-box.ps1
+
+      - name: Install v2ray-sn
+        shell: pwsh
+        run: |
+          .\tools\install-v2ray-sn.ps1
+
+      - name: Test
+        shell: pwsh
+        run: |
+          dotnet test .\Tests\Tests.csproj
+
       - name: Build
         shell: pwsh
         run: |
@@ -105,4 +130,4 @@ jobs:
             ## 校验和
             | 文件名 | SHA256 |
             | :- | :- |
-            | Netch.7z | ${{ env.Netch_SHA256 }} |
+            | Netch.7z | ${{ env.NETCH_SHA256 }} |

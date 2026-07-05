@@ -34,6 +34,31 @@ Some features may not be implemented in version 1
 - UDP NAT FullCone (Limited by your server)
 - .NET 6.0 x64
 
+## Modern Core Preview
+Version `1.9.8-modern.6` adds a publishable preview path for current airport/node subscriptions without removing the legacy Netch behavior.
+
+### Modern imports
+- Clash/mihomo YAML `proxies`
+- sing-box JSON `outbounds`
+- Existing Netch and share-link subscriptions
+- Modern share links: `anytls://`, `hy2://`, `hysteria2://`, `tuic://`, and VLESS REALITY / Vision links
+
+### Modern protocols
+- AnyTLS through sing-box, with default `h2` ALPN when the subscription omits ALPN
+- VLESS REALITY / Vision through sing-box
+- Hysteria2 through sing-box
+- TUIC through sing-box
+
+### Runtime notes
+- The release package includes `bin\sing-box.exe` when `tools\install-sing-box.ps1` has been run before packaging.
+- Modern nodes are imported as `ModernProxyServer` entries and started through the sing-box adapter.
+- Modern nodes can be edited from the server edit button, including SNI, ALPN, TLS, Reality, Hysteria2, and TUIC fields.
+- Subscription updates show an import report with imported count, skipped/unsupported warnings, and failed subscriptions.
+- The Server menu includes `HTTP Connectivity Test`; after startup, the speed/test icon runs the real HTTP connectivity test without disabling the whole window.
+- If the configured local SOCKS port is blocked by Windows or endpoint security software, the sing-box adapter falls back to a nearby available local port and reports the actual port to the mode controller.
+- Legacy Socks5, Shadowsocks, ShadowsocksR, Trojan, VMess, VLESS, WireGuard, and existing modes continue to use the existing controllers.
+- See `docs\release-1.9.8-modern.6.md`, `docs\release-1.9.8-modern.5.md`, `docs\release-1.9.8-modern.4.md`, `docs\release-1.9.8-modern.3.md`, `docs\release-1.9.8-modern.2.md`, `docs\release-1.9.8-modern.1.md`, `docs\release-modern-core-preview.md`, and `docs\sing-box-runtime.md` for release scope, runtime setup, and validation commands.
+
 ## Sponsor
 <a href="https://www.jetbrains.com/?from=Netch"><img src="jetbrains.svg" alt="JetBrains" width="200"/></a>
 
