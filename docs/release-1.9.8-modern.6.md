@@ -24,7 +24,11 @@ Keep the main window responsive while testing real HTTP connectivity.
 ## Validation Performed
 
 - `dotnet test .\Tests\Tests.csproj --no-restore`
+- `tools\smoke-sing-box.ps1 -SingBoxPath .\artifacts\netch-1.9.8-modern.6\bin\sing-box.exe -Port 29062`
+- `tools\smoke-v2ray-sn.ps1 -V2RayPath .\artifacts\netch-1.9.8-modern.6\bin\v2ray-sn.exe -Port 29061`
 
 ## Local Preview Artifact
 
-This section is updated when the local package is generated.
+- Package: `artifacts\Netch-1.9.8-modern.6.zip`
+- Size: `105525510` bytes
+- SHA256: `227344b432833818c593a67a97939a71fc40861a5bf185df51910211884b3eb9`
