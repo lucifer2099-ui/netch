@@ -1,4 +1,4 @@
-name: Netch Release CI
+﻿name: Netch Release CI
 on:
   push:
     tags:
@@ -124,10 +124,10 @@ jobs:
             ## Changelogs
             * This is an automated deployment of GitHub Actions, the change log should be updated manually soon
             
-            ## 更新日志
-            * 这是 GitHub Actions 自动化部署，更新日志应该很快会手动更�?
+            ## 鏇存柊鏃ュ織
+            * 杩欐槸 GitHub Actions 鑷姩鍖栭儴缃诧紝鏇存柊鏃ュ織搴旇寰堝揩浼氭墜鍔ㄦ洿鏂?
 
-            ## 校验�?
-            | 文件�?| SHA256 |
+            ## 鏍￠獙鍜?
+            | 鏂囦欢鍚?| SHA256 |
             | :- | :- |
             | Netch.7z | ${{ env.NETCH_SHA256 }} |
