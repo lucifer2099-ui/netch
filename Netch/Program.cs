@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Reflection;
 using System.Runtime.Versioning;
 using Windows.Win32;
@@ -101,9 +101,7 @@ public static class Program
         Application.ThreadException += Application_OnException;
         Application.ApplicationExit += Application_OnExit;
 
-        Application.SetHighDpiMode(HighDpiMode.DpiUnawareGdiScaled);
-        Application.EnableVisualStyles();
-        Application.SetCompatibleTextRenderingDefault(false);
+        ApplicationConfiguration.Initialize();
         Application.Run(Global.MainForm);
     }
 

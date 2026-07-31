@@ -19,7 +19,7 @@ param (
 
 	[Parameter()]
 	[bool]
-	$PublishReadyToRun = $False
+	$PublishReadyToRun = $True
 )
 
 Push-Location (Split-Path $MyInvocation.MyCommand.Path -Parent)

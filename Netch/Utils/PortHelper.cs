@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -45,13 +45,13 @@ public static class PortHelper
                     PInvoke.GetExtendedTcpTable(default, ref size, false, (uint)inet, TCP_TABLE_CLASS.TCP_TABLE_OWNER_PID_LISTENER, 0); // get size
                     var tcpTable = (MIB_TCPTABLE_OWNER_PID*)Marshal.AllocHGlobal((int)size);
 
-                    if ((err = PInvoke.GetExtendedTcpTable(tcpTable, ref size, false, (uint)inet, TCP_TABLE_CLASS.TCP_TABLE_OWNER_PID_LISTENER, 0)) !=
+                    if ((err = PInvoke.GetExtendedTcpTable(new Span<byte>(tcpTable, (int)size), ref size, false, (uint)inet, TCP_TABLE_CLASS.TCP_TABLE_OWNER_PID_LISTENER, 0)) !=
                         0)
                         throw new Win32Exception((int)err);
 
                     for (var i = 0; i < tcpTable -> dwNumEntries; i++)
                     {
-                        var row = tcpTable -> table.ReadOnlyItemRef(i);
+                        var row = tcpTable -> table[i];
 
                         if (row.dwOwningPid is 0 or 4)
                             continue;
