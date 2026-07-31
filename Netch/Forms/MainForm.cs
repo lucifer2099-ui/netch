@@ -1476,14 +1476,17 @@ public partial class MainForm : Form
         if (sender is not ComboBox cbx)
             return;
 
-        // 绘制背景颜色
-        e.Graphics.FillRectangle(Brushes.White, e.Bounds);
-
         if (e.Index < 0)
             return;
 
+        // 绘制默认背景和选中状态
+        e.DrawBackground();
+
+        // 判断文字颜色
+        var textColor = (e.State & DrawItemState.Selected) == DrawItemState.Selected ? SystemColors.HighlightText : cbx.ForeColor;
+        
         // 绘制 备注/名称 字符串
-        TextRenderer.DrawText(e.Graphics, cbx.Items[e.Index].ToString(), cbx.Font, e.Bounds, Color.Black, TextFormatFlags.Left);
+        TextRenderer.DrawText(e.Graphics, cbx.Items[e.Index].ToString(), cbx.Font, e.Bounds, textColor, TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
 
         switch (cbx.Items[e.Index])
         {
@@ -1492,34 +1495,21 @@ public partial class MainForm : Form
                 // 计算延迟底色
                 var numBoxBackBrush = item.Delay switch { > 200 => Brushes.Red, > 80 => Brushes.Yellow, >= 0 => _greenBrush, _ => Brushes.Gray };
 
-                // 绘制延迟底色
+                // 绘制延迟底色 (覆盖在最右侧)
                 e.Graphics.FillRectangle(numBoxBackBrush, _numberBoxX, e.Bounds.Y, _numberBoxWidth, e.Bounds.Height);
 
                 // 绘制延迟字符串
                 TextRenderer.DrawText(e.Graphics,
                     item.Delay.ToString(),
                     cbx.Font,
-                    new Point(_numberBoxX + _numberBoxWrap, e.Bounds.Y),
+                    new Rectangle(_numberBoxX + _numberBoxWrap, e.Bounds.Y, _numberBoxWidth, e.Bounds.Height),
                     Color.Black,
-                    TextFormatFlags.Left);
+                    TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
 
                 break;
             }
             case Mode item:
             {
-                /*
-                // 绘制 模式Box 底色
-                e.Graphics.FillRectangle(Brushes.Gray, _numberBoxX, e.Bounds.Y, _numberBoxWidth, e.Bounds.Height);
-
-                // 绘制 模式行数 字符串
-                TextRenderer.DrawText(e.Graphics,
-                    item.Content.Count.ToString(),
-                    cbx.Font,
-                    new Point(_numberBoxX + _numberBoxWrap, e.Bounds.Y),
-                    Color.Black,
-                    TextFormatFlags.Left);
-                    */
-
                 break;
             }
         }
