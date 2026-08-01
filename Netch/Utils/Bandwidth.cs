@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Session;
 using Microsoft.VisualStudio.Threading;
@@ -45,7 +45,7 @@ public static class Bandwidth
         if (!Flags.IsWindows10Upper)
             return;
 
-        var counterLock = new object();
+        var counterLock = new Lock();
         //int sent = 0;
 
         var processes = new List<Process>();

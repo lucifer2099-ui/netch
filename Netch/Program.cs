@@ -3,6 +3,8 @@ using System.Reflection;
 using System.Runtime.Versioning;
 using Windows.Win32;
 using Windows.Win32.Foundation;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.VisualStudio.Threading;
 using Netch.Controllers;
 using Netch.Enums;
@@ -60,7 +62,7 @@ public static class Program
                 Directory.CreateDirectory(item);
 
         // load configuration
-        Configuration.LoadAsync().Wait();
+        AppConfiguration.LoadAsync().Wait();
 
         // check if the program is already running
         if (!SingleInstance.TryStartSingleInstance())
@@ -87,6 +89,17 @@ public static class Program
         InitConsole();
 
         CreateLogger();
+
+        var builder = Host.CreateDefaultBuilder(args);
+        builder.UseSerilog();
+        builder.ConfigureServices(services =>
+        {
+            services.AddSingleton<MainForm>();
+            services.AddSingleton<ISingleInstanceService>(SingleInstance);
+        });
+
+        var host = builder.Build();
+        Global.ServiceProvider = host.Services;
 
         // load i18n
         i18N.Load(Global.Settings.Language);

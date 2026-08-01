@@ -6,7 +6,7 @@ using Netch.Models;
 
 namespace Netch.Utils;
 
-public static class Configuration
+public static class AppConfiguration
 {
     /// <summary>
     ///     数据目录
@@ -25,7 +25,7 @@ public static class Configuration
 
     private static readonly JsonSerializerOptions JsonSerializerOptions = Global.NewCustomJsonSerializerOptions();
 
-    static Configuration()
+    static AppConfiguration()
     {
         JsonSerializerOptions.Converters.Add(new ServerConverterWithTypeDiscriminator());
         JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());

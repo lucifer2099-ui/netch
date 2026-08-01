@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using Netch.Properties;
 using Netch.Utils;
 
@@ -54,7 +54,7 @@ public partial class GlobalBypassIPForm : Form
         foreach (var ip in IPListBox.Items)
             Global.Settings.TUNTAP.BypassIPs.Add((string)ip);
 
-        await Configuration.SaveAsync();
+        await AppConfiguration.SaveAsync();
         MessageBoxX.Show(i18N.Translate("Saved"));
         Close();
     }

@@ -99,18 +99,18 @@ public partial class MainForm : Form
         // 隐藏 ConnectivityStatusLabel
         ConnectivityStatusVisible(false);
 
-        // 加载快速配置
+        // 加载快速配�?
         LoadProfiles();
 
-        // 检查更新
+        // 检查更�?
         if (Global.Settings.CheckUpdateWhenOpened)
             CheckUpdateAsync().Forget();
 
-        // 检查订阅更新
+        // 检查订阅更�?
         if (Global.Settings.UpdateServersWhenOpened)
             UpdateServersFromSubscriptionAsync().Forget();
 
-        // 打开软件时启动加速，产生开始按钮点击事件
+        // 打开软件时启动加速，产生开始按钮点击事�?
         if (Global.Settings.StartWhenOpened)
             ControlButton.PerformClick();
 
@@ -124,7 +124,7 @@ public partial class MainForm : Form
         _numberBoxWrap = _numberBoxWidth / 30;
 
         _configurationGroupBoxHeight = ConfigurationGroupBox.Height;
-        _profileConfigurationHeight = ConfigurationGroupBox.Controls[0].Height / 3; // 因为 AutoSize, 所以得到的是Controls的总高度
+        _profileConfigurationHeight = ConfigurationGroupBox.Controls[0].Height / 3; // 因为 AutoSize, 所以得到的是Controls的总高�?
         _profileGroupBoxPaddingHeight = ProfileGroupBox.Height - ProfileTable.Height;
         _profileTableHeight = ProfileTable.Height;
     }
@@ -231,7 +231,7 @@ public partial class MainForm : Form
         NotifyTip(i18N.TranslateFormat("Import {0} server(s) form Clipboard", servers.Count));
 
         LoadServers();
-        await Configuration.SaveAsync();
+        await AppConfiguration.SaveAsync();
     }
 
     private async void AddServerToolStripMenuItem_Click([NotNull] object? sender, EventArgs? e)
@@ -245,7 +245,7 @@ public partial class MainForm : Form
         util.Create();
 
         LoadServers();
-        await Configuration.SaveAsync();
+        await AppConfiguration.SaveAsync();
         Show();
     }
 
@@ -318,7 +318,7 @@ public partial class MainForm : Form
             var summary = await SubscriptionUtil.UpdateServersAsync();
 
             LoadServers();
-            await Configuration.SaveAsync();
+            await AppConfiguration.SaveAsync();
             StatusText(i18N.Translate("Servers updated"));
             MessageBoxX.Show(summary.ToDisplayText(), summary.FailedCount > 0 ? LogLevel.WARNING : LogLevel.INFO);
         }
@@ -422,7 +422,7 @@ public partial class MainForm : Form
     #endregion
 
     /// <summary>
-    ///     菜单栏强制退出
+    ///     菜单栏强制退�?
     /// </summary>
     private void ForceExitToolStripMenuItem_Click(object sender, EventArgs e)
     {
@@ -491,7 +491,7 @@ public partial class MainForm : Form
             }
 
             await StopAsync();
-            await Configuration.SaveAsync();
+            await AppConfiguration.SaveAsync();
 
             // Update
             await Task.Run(updater.ApplyUpdate);
@@ -541,9 +541,9 @@ public partial class MainForm : Form
             return;
         }
 
-        Configuration.SaveAsync().Forget();
+        AppConfiguration.SaveAsync().Forget();
 
-        // 服务器、模式 需选择
+        // 服务器、模�?需选择
         if (ServerComboBox.SelectedItem is not Server server)
         {
             MessageBoxX.Show(i18N.Translate("Please select a server first"));
@@ -579,7 +579,7 @@ public partial class MainForm : Form
         if (Global.Settings.MinimizeWhenStarted)
             Minimize();
 
-        // 自动检测延迟
+        // 自动检测延�?
         async Task StartedPingAsync()
         {
             while (State == State.Started)
@@ -642,14 +642,14 @@ public partial class MainForm : Form
 
     private void SelectLastServer()
     {
-        // 如果值合法，选中该位置
+        // 如果值合法，选中该位�?
         if (Global.Settings.ServerComboBoxSelectedIndex > 0 && Global.Settings.ServerComboBoxSelectedIndex < ServerComboBox.Items.Count)
             ServerComboBox.SelectedIndex = Global.Settings.ServerComboBoxSelectedIndex;
-        // 如果值非法，且当前 ServerComboBox 中有元素，选择第一个位置
+        // 如果值非法，且当�?ServerComboBox 中有元素，选择第一个位�?
         else if (ServerComboBox.Items.Count > 0)
             ServerComboBox.SelectedIndex = 0;
 
-        // 如果当前 ServerComboBox 中没元素，不做处理
+        // 如果当前 ServerComboBox 中没元素，不做处�?
     }
 
     private void ServerComboBox_SelectionChangeCommitted(object sender, EventArgs o)
@@ -659,7 +659,7 @@ public partial class MainForm : Form
 
     private async void EditServerPictureBox_Click(object sender, EventArgs e)
     {
-        // 当前ServerComboBox中至少有一项
+        // 当前ServerComboBox中至少有一�?
         if (!(ServerComboBox.SelectedItem is Server server))
         {
             MessageBoxX.Show(i18N.Translate("Please select a server first"));
@@ -669,7 +669,7 @@ public partial class MainForm : Form
         Hide();
         ServerHelper.GetUtilByTypeName(server.Type).Edit(server);
         LoadServers();
-        await Configuration.SaveAsync();
+        await AppConfiguration.SaveAsync();
         Show();
     }
 
@@ -724,7 +724,7 @@ public partial class MainForm : Form
 
     private void CopyLinkPictureBox_Click(object sender, EventArgs e)
     {
-        // 当前ServerComboBox中至少有一项
+        // 当前ServerComboBox中至少有一�?
         if (!(ServerComboBox.SelectedItem is Server server))
         {
             MessageBoxX.Show(i18N.Translate("Please select a server first"));
@@ -733,7 +733,7 @@ public partial class MainForm : Form
 
         try
         {
-            //听说巨硬BUG经常会炸，所以Catch一下 :D
+            //听说巨硬BUG经常会炸，所以Catch一�?:D
             string text;
             if (ModifierKeys == Keys.Control)
                 text = ShareLink.GetNetchLink(server);
@@ -750,7 +750,7 @@ public partial class MainForm : Form
 
     private void DeleteServerPictureBox_Click(object sender, EventArgs e)
     {
-        // 当前 ServerComboBox 中至少有一项
+        // 当前 ServerComboBox 中至少有一�?
         if (!(ServerComboBox.SelectedItem is Server server))
         {
             MessageBoxX.Show(i18N.Translate("Please select a server first"));
@@ -781,14 +781,14 @@ public partial class MainForm : Form
 
     private void SelectLastMode()
     {
-        // 如果值合法，选中该位置
+        // 如果值合法，选中该位�?
         if (Global.Settings.ModeComboBoxSelectedIndex > 0 && Global.Settings.ModeComboBoxSelectedIndex < ModeComboBox.Items.Count)
             ModeComboBox.SelectedIndex = Global.Settings.ModeComboBoxSelectedIndex;
-        // 如果值非法，且当前 ModeComboBox 中有元素，选择第一个位置
+        // 如果值非法，且当�?ModeComboBox 中有元素，选择第一个位�?
         else if (ModeComboBox.Items.Count > 0)
             ModeComboBox.SelectedIndex = 0;
 
-        // 如果当前 ModeComboBox 中没元素，不做处理
+        // 如果当前 ModeComboBox 中没元素，不做处�?
     }
 
     private void ModeComboBox_SelectionChangeCommitted(object sender, EventArgs o)
@@ -805,7 +805,7 @@ public partial class MainForm : Form
 
     private void EditModePictureBox_Click(object sender, EventArgs e)
     {
-        // 当前ModeComboBox中至少有一项
+        // 当前ModeComboBox中至少有一�?
         if (ModeComboBox.SelectedIndex == -1)
         {
             MessageBoxX.Show(i18N.Translate("Please select a mode first"));
@@ -841,7 +841,7 @@ public partial class MainForm : Form
 
     private void DeleteModePictureBox_Click(object sender, EventArgs e)
     {
-        // 当前ModeComboBox中至少有一项
+        // 当前ModeComboBox中至少有一�?
         if (ModeComboBox.Items.Count <= 0 || ModeComboBox.SelectedIndex == -1)
         {
             MessageBoxX.Show(i18N.Translate("Please select a mode first"));
@@ -1009,7 +1009,7 @@ public partial class MainForm : Form
     private State _state = State.Waiting;
 
     /// <summary>
-    ///     当前状态
+    ///     当前状�?
     /// </summary>
     public State State
     {
@@ -1160,7 +1160,7 @@ public partial class MainForm : Form
     }
 
     /// <summary>
-    ///     更新 NAT指示灯颜色
+    ///     更新 NAT指示灯颜�?
     /// </summary>
     /// <param name="natType">NAT Type. keep default(-1) to Hide Light</param>
     private void UpdateNatTypeLight(int natType = -1)
@@ -1293,7 +1293,7 @@ public partial class MainForm : Form
                 }
 
                 break;
-            case PowerModes.Resume: //操作系统即将从挂起状态继续
+            case PowerModes.Resume: //操作系统即将从挂起状态继�?
                 if (_resumeFlag)
                 {
                     _resumeFlag = false;
@@ -1309,12 +1309,12 @@ public partial class MainForm : Form
 
     private void Minimize()
     {
-        // 使关闭时窗口向右下角缩小的效果
+        // 使关闭时窗口向右下角缩小的效�?
         WindowState = FormWindowState.Minimized;
 
         if (_isFirstCloseWindow)
         {
-            // 显示提示语
+            // 显示提示�?
             NotifyTip(i18N.Translate("Netch is now minimized to the notification bar, double click this icon to restore."));
             _isFirstCloseWindow = false;
         }
@@ -1337,7 +1337,7 @@ public partial class MainForm : Form
         Hide();
 
         if (saveConfiguration)
-            await Configuration.SaveAsync();
+            await AppConfiguration.SaveAsync();
 
         foreach (var file in new[] { Constants.TempConfig, Constants.TempRouteFile })
             if (File.Exists(file))
@@ -1363,7 +1363,7 @@ public partial class MainForm : Form
             // 如果未勾选关闭窗口时退出，隐藏至右下角托盘图标
             if (!Global.Settings.ExitWhenClosed)
                 Minimize();
-            // 如果勾选了关闭时退出，自动点击退出按钮
+            // 如果勾选了关闭时退出，自动点击退出按�?
             else
                 Exit();
         }
@@ -1421,7 +1421,7 @@ public partial class MainForm : Form
         try
         {
             UsedBandwidthLabel.Text = $"{i18N.Translate("Used", ": ")}{Bandwidth.Compute(download)}";
-            //UploadSpeedLabel.Text = $"↑: {Utils.Bandwidth.Compute(upload - LastUploadBandwidth)}/s";
+            //UploadSpeedLabel.Text = $"�? {Utils.Bandwidth.Compute(upload - LastUploadBandwidth)}/s";
             DownloadSpeedLabel.Text = $"↑↓: {Bandwidth.Compute(download - LastDownloadBandwidth)}/s";
 
             //LastUploadBandwidth = upload;
@@ -1444,7 +1444,7 @@ public partial class MainForm : Form
     }
 
     /// <summary>
-    ///     通知图标右键菜单退出
+    ///     通知图标右键菜单退�?
     /// </summary>
     private void ExitToolStripButton_Click(object sender, EventArgs e)
     {
@@ -1458,7 +1458,7 @@ public partial class MainForm : Form
 
     public void NotifyTip(string text, int timeout = 0, bool info = true)
     {
-        // 会阻塞线程 timeout 秒(?)
+        // 会阻塞线�?timeout �??)
         NotifyIcon.ShowBalloonTip(timeout, UpdateChecker.Name, text, info ? ToolTipIcon.Info : ToolTipIcon.Error);
     }
 
@@ -1479,13 +1479,13 @@ public partial class MainForm : Form
         if (e.Index < 0)
             return;
 
-        // 绘制默认背景和选中状态
+        // 绘制默认背景和选中状�?
         e.DrawBackground();
 
         // 判断文字颜色
         var textColor = (e.State & DrawItemState.Selected) == DrawItemState.Selected ? SystemColors.HighlightText : cbx.ForeColor;
         
-        // 绘制 备注/名称 字符串
+        // 绘制 备注/名称 字符�?
         TextRenderer.DrawText(e.Graphics, cbx.Items[e.Index].ToString(), cbx.Font, e.Bounds, textColor, TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
 
         switch (cbx.Items[e.Index])
@@ -1498,7 +1498,7 @@ public partial class MainForm : Form
                 // 绘制延迟底色 (覆盖在最右侧)
                 e.Graphics.FillRectangle(numBoxBackBrush, _numberBoxX, e.Bounds.Y, _numberBoxWidth, e.Bounds.Height);
 
-                // 绘制延迟字符串
+                // 绘制延迟字符�?
                 TextRenderer.DrawText(e.Graphics,
                     item.Delay.ToString(),
                     cbx.Font,

@@ -1,6 +1,7 @@
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.DependencyInjection;
 using Netch.Forms;
 using Netch.Models;
 using Netch.Models.Modes;
@@ -10,10 +11,12 @@ namespace Netch;
 
 public static class Global
 {
+    public static IServiceProvider ServiceProvider { get; set; } = null!;
+
     /// <summary>
     ///     主窗体的静态实例
     /// </summary>
-    private static readonly Lazy<MainForm> LazyMainForm = new(() => new MainForm());
+    public static MainForm MainForm => ServiceProvider.GetRequiredService<MainForm>();
 
     /// <summary>
     ///     用于读取和写入的配置
@@ -35,11 +38,6 @@ public static class Global
         NetchExecutable = Application.ExecutablePath;
         NetchDir = Application.StartupPath;
     }
-
-    /// <summary>
-    ///     主窗体的静态实例
-    /// </summary>
-    public static MainForm MainForm => LazyMainForm.Value;
 
     public static JsonSerializerOptions NewCustomJsonSerializerOptions() => new()
     {

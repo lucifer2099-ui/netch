@@ -1,4 +1,4 @@
-ï»¿using Netch.Models;
+using Netch.Models;
 using Netch.Properties;
 using Netch.Utils;
 
@@ -39,7 +39,7 @@ public partial class SubscriptionForm : Form
     }
 
     /// <summary>
-    ///     é€‰ä¸­/å–æ¶ˆé€‰ä¸­
+    ///     Ñ¡ÖĞ/È¡ÏûÑ¡ÖĞ
     /// </summary>
     private void SubscriptionLinkListView_SelectedIndexChanged(object sender, EventArgs e)
     {
@@ -47,7 +47,7 @@ public partial class SubscriptionForm : Form
     }
 
     /// <summary>
-    ///     è®¢é˜…å¯/ç¦ç”¨
+    ///     ¶©ÔÄÆô/½ûÓÃ
     /// </summary>
     private void SubscriptionLinkListView_ItemChecked(object sender, ItemCheckedEventArgs e)
     {
@@ -57,7 +57,7 @@ public partial class SubscriptionForm : Form
 
     private async void SubscriptionForm_FormClosing(object sender, FormClosingEventArgs e)
     {
-        await Configuration.SaveAsync();
+        await AppConfiguration.SaveAsync();
     }
 
     #endregion

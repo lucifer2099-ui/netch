@@ -279,7 +279,7 @@ public partial class SettingForm : BindingForm
 
         Utils.Utils.RegisterNetchStartupItem();
 
-        await Configuration.SaveAsync();
+        await AppConfiguration.SaveAsync();
         MessageBoxX.Show(i18N.Translate("Saved"));
         Close();
     }

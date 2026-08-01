@@ -16,7 +16,7 @@ public static class SubscriptionUtil
         "sing-box/1.13.0"
     };
 
-    private static readonly object ServerLock = new();
+    private static readonly Lock ServerLock = new();
 
     public static async Task<SubscriptionUpdateSummary> UpdateServersAsync(string? proxyServer = default)
     {
