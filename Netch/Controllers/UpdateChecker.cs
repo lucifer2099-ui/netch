@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -15,8 +15,8 @@ public static class UpdateChecker
     public const string Name = @"Netch";
     public const string Copyright = @"Copyright © 2019 - 2022";
 
-    public const string AssemblyVersion = @"1.9.8";
-    private const string Suffix = @"modern.6";
+    public const string AssemblyVersion = @"1.9.9";
+    private const string Suffix = @"";
     public const string InformationalVersion = AssemblyVersion + "-" + Suffix;
 
     public static readonly string Version = $"{AssemblyVersion}{(string.IsNullOrEmpty(Suffix) ? "" : $"-{Suffix}")}";
